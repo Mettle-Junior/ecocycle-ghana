@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Pickup - EcoCycle</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <!-- Google Maps API (replace YOUR_API_KEY) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete" async defer></script>
+  <style>
+    .photo-preview {
+      width: 100%;
+      max-width: 300px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 2px dashed #ddd;
+      padding: 10px;
+      display: none;
+    }
+    .photo-preview img {
+      width: 100%;
+      border-radius: 4px;
+    }
+    .camera-btn {
+      background: #0b3b2c;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .camera-btn:hover {
+      background: #1e5a44;
+    }
+  </style>
+</head>
+<body>
+  <div id="spinner-overlay">
+        <div class="spinner"></div>
+  </div>
+  <nav class="navbar">
+    <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+    <div class="container">
+      <a href="user-dashboard.html" class="logo">♻️ EcoCycle</a>
+      <div class="nav-links">
+        <a href="request-pickup.html">Request Pickup</a>
+        <a href="user-dashboard.html">Dashboard</a>
+        <a href="#" id="logoutBtn" class="btn-logout">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="max-width: 700px; margin-top: 2rem;">
+    <div class="card">
+      <h2>📦 Request a Pickup</h2>
+      <form id="pickupForm">
+        <div class="form-group">
+          <label>Waste Category</label>
+          <select name="category_id" required>
+            <option value="">Select...</option>
+            <option value="1">Plastics</option>
+            <option value="2">Metals</option>
+            <option value="3">Glass</option>
+            <option value="4">Paper</option>
+            <option value="5">Rubber</option>
+            <option value="6">E-waste</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estimated Weight (kg)</label>
+          <input name="estimated_weight" type="number" step="0.5" required>
+        </div>
+        
+        <!-- NEW: Live Photo Capture -->
+        <div class="form-group">
+          <label>Take a Photo of Your Waste</label>
+          <div>
+            <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;">
+            <button type="button" id="cameraBtn" class="camera-btn">📷 Open Camera</button>
+            <button type="button" id="uploadBtn" class="camera-btn" style="background: #27ae60;">📁 Choose File</button>
+          </div>
+          <div class="photo-preview" id="photoPreview">
+            <img id="photoPreviewImg" src="" alt="Waste photo preview">
+          </div>
+          <input type="hidden" id="photoData" name="photo_data">
+        </div>
+
+        <div class="form-group">
+          <label>Pickup Location</label>
+          <input id="pickup_address" name="pickup_address" placeholder="Enter your address (e.g., Accra, Spintex Road)" required>
+          <button type="button" id="getLocationBtn" class="btn btn-warning" style="margin-top:0.5rem;">📍 Use My Current Location</button>
+          <div style="margin-top:0.5rem; font-size:0.9rem; color:#666;">
+            <span id="locationStatus">📍 Enter address or click the button above</span>
+          </div>
+        </div>
+<input type="hidden" id="pickup_lat" name="pickup_lat">
+<input type="hidden" id="pickup_lng" name="pickup_lng">
+        <div class="form-group">
+          <label>Schedule (optional)</label>
+          <input name="scheduled_date" type="datetime-local">
+        </div>
+        <button type="submit" class="btn btn-success" style="width:100%;">Submit Pickup Request</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../assets/js/requestPickup.js"></script>
+  <script type="module" src="../assets/js/nav.js"></script>
+  <div id="toast-container" class="toast-container"></div>
+</body>
+</html>

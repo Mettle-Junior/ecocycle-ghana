@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoCycle Ghana</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <style>
+    .hero {
+      background: linear-gradient(135deg, #0b3b2c, #1e5a44);
+      color: white;
+      padding: 4rem 0;
+      text-align: center;
+      border-radius: 0 0 40px 40px;
+    }
+    .hero h1 { font-size: 3rem; margin-bottom: 1rem; }
+    .hero p { font-size: 1.2rem; max-width: 700px; margin: 0 auto 2rem; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .feature-card h3 { color: #0b3b2c; margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div id="spinner-overlay">
+        <div class="spinner"></div>
+  </div>
+  <nav class="navbar">
+    <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+    <div class="container">
+      <a href="index.html" class="logo">♻️ EcoCycle</a>
+      <div class="nav-links">
+        <a href="login.html">Login</a>
+        <a href="register.html" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Turn Waste into Rewards</h1>
+      <p>Earn fuel, supermarket, and cash coupons by recycling your plastics, metals, and e-waste with EcoCycle Ghana.</p>
+      <a href="register.html" class="btn btn-warning" style="font-size:1.2rem; padding:1rem 3rem;">Join the Movement</a>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3>📱 Request Pickup</h3>
+        <p>Select your waste type, take a photo, and request a pickup from your location.</p>
+      </div>
+      <div class="feature-card">
+        <h3>💰 Earn Points</h3>
+        <p>Get rewarded based on the weight of your waste. 1 kg = 1 point = 1 GHS equivalent.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🎁 Redeem Vouchers</h3>
+        <p>Exchange your points for fuel coupons, supermarket vouchers, or ECG credits.</p>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="../assets/js/nav.js"></script>
+  <div id="toast-container" class="toast-container"></div>
+</body>
+</html>

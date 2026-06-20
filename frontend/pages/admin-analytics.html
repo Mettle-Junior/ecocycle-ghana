@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - EcoCycle Admin</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .stat-card .number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #0b3b2c;
+    }
+    .stat-card .label {
+      color: #666;
+      margin-top: 0.5rem;
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .chart-box {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .chart-box h3 {
+      margin-bottom: 1rem;
+      color: #0b3b2c;
+    }
+    .chart-box canvas {
+      max-height: 300px;
+      max-width: 100%;
+    }
+    .full-width {
+      grid-column: 1 / -1;
+    }
+    @media (max-width: 768px) {
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+    <div id="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
+    <nav class="navbar">
+        <div class="container">
+            <a href="admin-dashboard.html" class="logo">♻️ EcoCycle Admin</a>
+            <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+            <div class="nav-links">
+                <a href="admin-dashboard.html" class="active">Pickups</a>
+                <a href="admin-rewards.html">Rewards</a>
+                <a href="admin-analytics.html">Analytics</a>
+                <a href="admin-users.html">Users</a>
+                <a href="#" id="logoutBtn" class="btn-logout">Logout</a>
+            </div>
+        </div> 
+    </nav>
+
+  <div class="container" style="margin-top: 2rem;">
+    <h1>📊 Analytics Dashboard</h1>
+
+    <!-- Summary Stats -->
+    <div class="stats-grid" id="summaryStats">
+      <div class="stat-card"><div class="number" id="totalPickups">0</div><div class="label">Pickups Collected</div></div>
+      <div class="stat-card"><div class="number" id="totalPoints">0</div><div class="label">Points Issued</div></div>
+      <div class="stat-card"><div class="number" id="vouchersRedeemed">0</div><div class="label">Vouchers Redeemed</div></div>
+      <div class="stat-card"><div class="number" id="activeCitizens">0</div><div class="label">Active Citizens</div></div>
+    </div>
+
+    <!-- Charts -->
+    <div class="chart-grid">
+      <div class="chart-box">
+        <h3>🗑️ Waste by Category</h3>
+        <canvas id="wasteChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>📈 Pickups Over Time (Last 7 Days)</h3>
+        <canvas id="pickupsChart"></canvas>
+      </div>
+      <div class="chart-box full-width">
+        <h3>🏆 Top Recyclers</h3>
+        <canvas id="topRecyclersChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="../assets/js/nav.js"></script>
+  <script type="module" src="../assets/js/admin-analytics.js"></script>
+  <div id="toast-container" class="toast-container"></div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - EcoCycle</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+</head>
+<body>
+  <div id="spinner-overlay">
+        <div class="spinner"></div>
+  </div>
+  <nav class="navbar">
+      <div class="container">
+          <a href="admin-dashboard.html" class="logo">♻️ EcoCycle Admin</a>
+          <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+          <div class="nav-links">
+            <a href="admin-dashboard.html" class="active">Pickups</a>
+            <a href="admin-rewards.html">Rewards</a>
+            <a href="admin-analytics.html">Analytics</a>
+            <a href="admin-users.html">Users</a>
+            <a href="#" id="logoutBtn" class="btn-logout">Logout</a>
+          </div>
+      </div> 
+  </nav>
+
+  <div class="container" style="margin-top: 2rem;">
+    <div class="card">
+      <h2>📋 Pending Pickups</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Citizen</th><th>Category</th><th>Est. Weight</th><th>Address</th><th>Date</th><th>Assign To</th><th>Action</th></tr>
+          </thead>
+          <tbody id="pendingPickupsTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <script type="module" src="../assets/js/admin.js"></script>
+  <script type="module" src="../assets/js/nav.js"></script>
+  <div id="toast-container" class="toast-container"></div>
+</body>
+</html>

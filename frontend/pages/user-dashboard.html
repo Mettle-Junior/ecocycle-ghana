@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - EcoCycle</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+</head>
+<body>
+  <div id="spinner-overlay">
+        <div class="spinner"></div>
+  </div>
+  <nav class="navbar">
+    <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+    <div class="container">
+      <a href="user-dashboard.html" class="logo">♻️ EcoCycle</a>
+      <div class="nav-links">
+        <a href="request-pickup.html">Request Pickup</a>
+        <a href="user-dashboard.html">Dashboard</a>
+        <a href="rewards-wallet.html">My Rewards</a>
+        <a href="#" id="logoutBtn" class="btn-logout">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="margin-top: 2rem;">
+    <h1>Welcome, <span id="userName"></span>! 👋</h1>
+    
+    <div class="card" style="background: #0b3b2c; color: white;">
+      <h2 style="color: #f5c842;">⭐ Your Total Points</h2>
+      <p style="font-size: 3rem; font-weight: bold;"><span id="totalPoints">0</span> pts</p>
+      <p style="color: #a8d5ba;">Earn points by recycling your waste. Exchange them for vouchers!</p>
+    </div>
+
+    <div class="card">
+      <h2>📋 Pickup History</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Est. Weight</th>
+              <th>Actual Weight</th>
+              <th>Points Earned</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../assets/js/dashboard.js"></script>
+  <script type="module" src="../assets/js/nav.js"></script>
+  <div id="toast-container" class="toast-container"></div>
+</body>
+</html>

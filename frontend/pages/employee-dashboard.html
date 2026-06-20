@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Dashboard - EcoCycle</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <style>
+    .pickup-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      border-left: 4px solid #f5c842;
+    }
+    .pickup-card .info { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .pickup-card .info > div { flex: 1; min-width: 150px; }
+    .pickup-card .actions { margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .badge-pending { background: #f39c12; color: white; }
+    .badge-collected { background: #27ae60; color: white; }
+    .weight-input { width: 100px; padding: 0.4rem; border-radius: 6px; border: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+    <div id="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
+  <nav class="navbar">
+    <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+    <div class="container">
+      <a href="employee-dashboard.html" class="logo">♻️ EcoCycle Employee</a>
+      <div class="nav-links">
+        <a href="employee-dashboard.html">My Pickups</a>
+        <a href="#" id="logoutBtn" class="btn-logout">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="margin-top: 2rem;">
+    <h1>👋 Welcome, <span id="employeeName"></span></h1>
+
+    <div class="card">
+      <h2>📦 Assigned Pickups</h2>
+      <div id="assignedList">
+        <p>Loading assigned pickups...</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📋 Collection History</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Citizen</th>
+              <th>Category</th>
+              <th>Weight (kg)</th>
+              <th>Address</th>
+              <th>Collected At</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr><td colspan="5" class="text-center">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../assets/js/employee.js"></script>
+  <script type="module" src="../assets/js/nav.js"></script>
+  <div id="toast-container" class="toast-container"></div>
+</body>
+</html>

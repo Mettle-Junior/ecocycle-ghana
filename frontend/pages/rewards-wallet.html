@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Rewards - EcoCycle</title>
+  <link rel="stylesheet" href="../assets/css/global.css">
+  <style>
+    .voucher-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .voucher-card .info h3 { margin: 0; color: #0b3b2c; }
+    .voucher-card .info p { margin: 0.3rem 0; color: #555; }
+    .points-badge {
+      background: #f5c842;
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-weight: bold;
+      color: #1e2a41;
+    }
+    .btn-redeem {
+      background: #0b3b2c;
+      color: white;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-redeem:hover { background: #1e5a44; }
+    .btn-redeem:disabled { background: #ccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+    <div id="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
+  <nav class="navbar">
+    <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+    <div class="container">
+      <a href="user-dashboard.html" class="logo">♻️ EcoCycle</a>
+      <div class="nav-links">
+        <a href="request-pickup.html">Request Pickup</a>
+        <a href="user-dashboard.html">Dashboard</a>
+        <a href="rewards-wallet.html" style="font-weight:bold;">My Rewards</a>
+        <a href="#" id="logoutBtn" class="btn-logout">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="margin-top: 2rem;">
+    <div class="card" style="background: #0b3b2c; color: white; text-align: center;">
+      <h2 style="color: #f5c842;">⭐ Your Balance</h2>
+      <p style="font-size: 3rem; font-weight: bold;" id="walletPoints">0</p>
+      <p style="color: #a8d5ba;">Points available to redeem</p>
+    </div>
+
+    <div class="card">
+      <h2>🎁 Available Vouchers</h2>
+      <div id="voucherList">
+        <p>Loading vouchers...</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📜 My Redeemed Vouchers</h2>
+      <div id="redeemedVouchers">
+        <p>You haven't redeemed any vouchers yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../assets/js/rewards.js"></script>
+  <script type="module" src="../assets/js/nav.js"></script>
+  <div id="toast-container" class="toast-container"></div>
+</body>
+</html>
