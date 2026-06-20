@@ -1,6 +1,6 @@
 import { showToast } from './toast.js';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://ecocycle-api.onrender.com/api';
 
 // Spinner control
 const showSpinner = () => {
