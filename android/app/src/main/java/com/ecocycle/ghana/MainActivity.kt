@@ -56,6 +56,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Configure live cloud domain URL here (e.g., "https://ecocycle-ghana.onrender.com")
+    // Set to empty string "" to fall back to local Chaquopy embedded Python backend
+    private val LIVE_SERVER_URL: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -69,8 +73,12 @@ class MainActivity : AppCompatActivity() {
         setupSwipeRefresh()
         setupBackNavigation()
 
-        // Start Local Python Flask Backend via Chaquopy
-        startPythonBackend()
+        if (LIVE_SERVER_URL.isNotEmpty()) {
+            webView.loadUrl(LIVE_SERVER_URL)
+        } else {
+            // Start Local Python Flask Backend via Chaquopy
+            startPythonBackend()
+        }
     }
 
     private fun requestRequiredPermissions() {
@@ -111,7 +119,8 @@ class MainActivity : AppCompatActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                 val url = request?.url?.toString() ?: return false
-                if (url.startsWith("http://127.0.0.1:5000") || url.startsWith("http://localhost:5000")) {
+                if (url.startsWith("http://127.0.0.1:5000") || url.startsWith("http://localhost:5000") ||
+                    (LIVE_SERVER_URL.isNotEmpty() && url.startsWith(LIVE_SERVER_URL))) {
                     return false
                 }
                 // Open external links in device browser

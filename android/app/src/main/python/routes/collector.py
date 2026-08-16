@@ -18,7 +18,7 @@ def dashboard():
         status="Assigned"
     ).all()
 
-    return render_template("collector_dashboard.html", pickups=pickups)
+    return render_template("collector_dashboard.html", pickups=pickups, user=current_user)
 
 
 @collector_bp.route("/collector/complete/<int:id>", methods=["GET", "POST"])
