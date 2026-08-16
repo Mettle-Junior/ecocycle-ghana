@@ -1,0 +1,539 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="report-header">
+    <div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-primary);">Visual Analytics & Intelligence Report</h1>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.2rem;">Real-time performance tracking for EcoCycle Ghana waste management.</p>
+    </div>
+
+    <div class="report-controls">
+        <div class="time-filter-group">
+            <button id="btn-weekly" class="time-filter-btn {% if report_data.timeframe == 'weekly' %}active{% endif %}" onclick="switchTimeframe('weekly')">Weekly</button>
+            <button id="btn-monthly" class="time-filter-btn {% if report_data.timeframe == 'monthly' %}active{% endif %}" onclick="switchTimeframe('monthly')">Monthly</button>
+            <button id="btn-all" class="time-filter-btn {% if report_data.timeframe == 'all' %}active{% endif %}" onclick="switchTimeframe('all')">All Time</button>
+        </div>
+
+        <button onclick="exportReportCSV()" class="btn btn-secondary btn-sm" title="Export report data as CSV">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export CSV
+        </button>
+
+        <button onclick="window.print()" class="btn btn-secondary btn-sm" title="Print visual report">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 6 2 18 2 18 9"/>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Print Report
+        </button>
+    </div>
+</div>
+
+<div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+    <a href="/admin/requests" class="btn btn-primary btn-sm">Manage Requests</a>
+    <a href="/admin/users" class="btn btn-secondary btn-sm">Users & Roles</a>
+    <a href="/admin/rewards" class="btn btn-secondary btn-sm">Reward Catalog</a>
+</div>
+
+<!-- EXECUTIVE KPI METRICS GRID -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="kpi-card">
+        <div class="kpi-icon green">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+        </div>
+        <div class="kpi-content">
+            <div class="stat-label">Total Recycled Volume</div>
+            <div class="kpi-value" id="kpi-weight">{{ report_data.kpi.total_weight_kg }} <span style="font-size: 1.1rem; color: var(--text-secondary);">kg</span></div>
+            <div class="kpi-meta">Collected across all waste categories</div>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon sky">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+        </div>
+        <div class="kpi-content">
+            <div class="stat-label">Citizen Pickup Requests</div>
+            <div class="kpi-value" id="kpi-requests">{{ report_data.kpi.total_requests }}</div>
+            <div class="kpi-meta" id="kpi-requests-breakdown">
+                <span style="color: #15803d; font-weight: 700;">{{ report_data.kpi.completed_requests }} Collected</span> • 
+                <span style="color: #0369a1; font-weight: 700;">{{ report_data.kpi.assigned_requests }} Assigned</span> • 
+                <span style="color: #b45309; font-weight: 700;">{{ report_data.kpi.pending_requests }} Pending</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon amber">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+        </div>
+        <div class="kpi-content">
+            <div class="stat-label">Collection Fulfillment Rate</div>
+            <div class="kpi-value" id="kpi-rate">{{ report_data.kpi.completion_rate }}%</div>
+            <div class="perf-bar-bg">
+                <div class="perf-bar-fill" id="kpi-rate-bar" style="width: {{ report_data.kpi.completion_rate }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon purple">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+        </div>
+        <div class="kpi-content">
+            <div class="stat-label">Rewards & Redemptions</div>
+            <div class="kpi-value" id="kpi-redemptions">{{ report_data.kpi.total_redemptions }} <span style="font-size: 1.1rem; color: var(--text-secondary);">vouchers</span></div>
+            <div class="kpi-meta" id="kpi-points-spent">{{ report_data.kpi.total_points_spent }} reward points redeemed</div>
+        </div>
+    </div>
+</div>
+
+<!-- CHARTS GRID -->
+<div class="charts-grid">
+    <!-- TIMELINE CHART (Citizen vs Collector) -->
+    <div class="chart-card full-width">
+        <div class="chart-header">
+            <div>
+                <h3 class="chart-title">Citizen Pickup Requests vs. Collector Fulfillment Trends</h3>
+                <p class="chart-subtitle">Compare citizen request creation vs. collector completion activity and total volume (kg) collected over time</p>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="timelineChart"></canvas>
+        </div>
+    </div>
+
+    <!-- WASTE CATEGORY DOUGHNUT CHART -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <div>
+                <h3 class="chart-title">Waste Type Distribution (Kg Recycled)</h3>
+                <p class="chart-subtitle">Breakdown of recycled waste materials by weight (kg)</p>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="wasteChart"></canvas>
+        </div>
+    </div>
+
+    <!-- REWARD REDEMPTIONS BAR CHART -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <div>
+                <h3 class="chart-title">Popular Citizen Reward Redemptions</h3>
+                <p class="chart-subtitle">Top incentive vouchers redeemed by active citizens</p>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="redemptionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- COLLECTOR PERFORMANCE BAR CHART -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <div>
+                <h3 class="chart-title">Collector Operations & Workload</h3>
+                <p class="chart-subtitle">Assigned requests vs. completed collections by collector</p>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="collectorChart"></canvas>
+        </div>
+    </div>
+
+    <!-- REGIONAL HOTSPOTS BAR CHART -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <div>
+                <h3 class="chart-title">Regional Recycling Activity Hotspots</h3>
+                <p class="chart-subtitle">Top location zones submitting pickup requests</p>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="locationChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- COLLECTOR PERFORMANCE DETAILED TABLE -->
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-title">
+        <span>Collector Fulfillment & Activity Leaderboard</span>
+        <span class="role-pill">{{ report_data.kpi.active_collectors }} Active Collectors</span>
+    </div>
+    
+    <div class="table-container" style="margin-top: 1rem;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Collector Name</th>
+                    <th>Assigned Pickups</th>
+                    <th>Completed Pickups</th>
+                    <th>Fulfillment Rate</th>
+                    <th>Total Waste Collected (Kg)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="collector-table-body">
+                {% for c in report_data.collector_perf %}
+                <tr>
+                    <td><strong>{{ c.name }}</strong></td>
+                    <td>{{ c.assigned }}</td>
+                    <td><span class="badge badge-collected">{{ c.completed }}</span></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>{{ c.rate }}%</span>
+                            <div class="perf-bar-bg" style="width: 80px;">
+                                <div class="perf-bar-fill" style="width: {{ c.rate }}%;"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><strong>{{ c.weight }} kg</strong></td>
+                    <td><span class="badge badge-assigned">Active</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted);">No collector activity recorded for this period.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Initial Report Data from Flask backend
+    let reportData = {{ report_data | tojson }};
+    
+    // Global Chart Instances
+    let timelineChart, wasteChart, redemptionChart, collectorChart, locationChart;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        initCharts(reportData);
+    });
+
+    function initCharts(data) {
+        // 1. Timeline Chart (Line / Bar combination)
+        const ctxTimeline = document.getElementById('timelineChart').getContext('2d');
+        timelineChart = new Chart(ctxTimeline, {
+            type: 'line',
+            data: {
+                labels: data.timeline.labels,
+                datasets: [
+                    {
+                        label: 'Citizen Requests Created',
+                        data: data.timeline.created,
+                        borderColor: '#0ea5e9',
+                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4
+                    },
+                    {
+                        label: 'Collector Completed Pickups',
+                        data: data.timeline.completed,
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.15)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4
+                    },
+                    {
+                        label: 'Volume Recycled (kg)',
+                        data: data.timeline.weight,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.4)',
+                        borderWidth: 2,
+                        type: 'bar',
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', weight: '600' } } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Number of Requests' },
+                        grid: { color: '#f1f5f9' }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        title: { display: true, text: 'Total Weight (kg)' },
+                        grid: { drawOnChartArea: false }
+                    },
+                    x: { grid: { color: '#f1f5f9' } }
+                }
+            }
+        });
+
+        // 2. Waste Type Breakdown (Doughnut Chart)
+        const ctxWaste = document.getElementById('wasteChart').getContext('2d');
+        const wasteLabels = Object.keys(data.waste_breakdown);
+        const wasteWeights = wasteLabels.map(k => data.waste_breakdown[k].weight);
+
+        wasteChart = new Chart(ctxWaste, {
+            type: 'doughnut',
+            data: {
+                labels: wasteLabels,
+                datasets: [{
+                    data: wasteWeights,
+                    backgroundColor: [
+                        '#16a34a',
+                        '#0ea5e9',
+                        '#f59e0b',
+                        '#8b5cf6',
+                        '#ec4899',
+                        '#64748b'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { font: { family: 'Plus Jakarta Sans', weight: '600' } } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.label}: ${context.raw} kg`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 3. Citizen Reward Redemptions (Bar Chart)
+        const ctxRedemption = document.getElementById('redemptionChart').getContext('2d');
+        redemptionChart = new Chart(ctxRedemption, {
+            type: 'bar',
+            data: {
+                labels: data.top_redemptions.labels.length > 0 ? data.top_redemptions.labels : ['No Redemptions'],
+                datasets: [{
+                    label: 'Vouchers Redeemed',
+                    data: data.top_redemptions.data.length > 0 ? data.top_redemptions.data : [0],
+                    backgroundColor: '#9333ea',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, ticks: { stepSize: 1 } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 4. Collector Performance (Grouped Bar Chart)
+        const ctxCollector = document.getElementById('collectorChart').getContext('2d');
+        const cNames = data.collector_perf.map(c => c.name);
+        const cAssigned = data.collector_perf.map(c => c.assigned);
+        const cCompleted = data.collector_perf.map(c => c.completed);
+
+        collectorChart = new Chart(ctxCollector, {
+            type: 'bar',
+            data: {
+                labels: cNames.length > 0 ? cNames : ['No Collectors'],
+                datasets: [
+                    {
+                        label: 'Assigned',
+                        data: cAssigned,
+                        backgroundColor: '#93c5fd',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Completed',
+                        data: cCompleted,
+                        backgroundColor: '#16a34a',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+
+        // 5. Location Hotspots (Bar Chart)
+        const ctxLocation = document.getElementById('locationChart').getContext('2d');
+        locationChart = new Chart(ctxLocation, {
+            type: 'bar',
+            data: {
+                labels: data.top_locations.labels.length > 0 ? data.top_locations.labels : ['N/A'],
+                datasets: [{
+                    label: 'Pickup Requests',
+                    data: data.top_locations.data.length > 0 ? data.top_locations.data : [0],
+                    backgroundColor: '#ef4444',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    }
+
+    function switchTimeframe(tf) {
+        document.querySelectorAll('.time-filter-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`btn-${tf}`).classList.add('active');
+
+        fetch(`/admin/api/reports?timeframe=${tf}`)
+            .then(res => res.json())
+            .then(data => {
+                reportData = data;
+                updateDashboardUI(data);
+            })
+            .catch(err => console.error("Error updating report data:", err));
+    }
+
+    function updateDashboardUI(data) {
+        document.getElementById('kpi-weight').innerHTML = `${data.kpi.total_weight_kg} <span style="font-size: 1.1rem; color: var(--text-secondary);">kg</span>`;
+        document.getElementById('kpi-requests').innerText = data.kpi.total_requests;
+        document.getElementById('kpi-requests-breakdown').innerHTML = `
+            <span style="color: #15803d; font-weight: 700;">${data.kpi.completed_requests} Collected</span> • 
+            <span style="color: #0369a1; font-weight: 700;">${data.kpi.assigned_requests} Assigned</span> • 
+            <span style="color: #b45309; font-weight: 700;">${data.kpi.pending_requests} Pending</span>
+        `;
+        document.getElementById('kpi-rate').innerText = `${data.kpi.completion_rate}%`;
+        document.getElementById('kpi-rate-bar').style.width = `${data.kpi.completion_rate}%`;
+        document.getElementById('kpi-redemptions').innerHTML = `${data.kpi.total_redemptions} <span style="font-size: 1.1rem; color: var(--text-secondary);">vouchers</span>`;
+        document.getElementById('kpi-points-spent').innerText = `${data.kpi.total_points_spent} reward points redeemed`;
+
+        timelineChart.data.labels = data.timeline.labels;
+        timelineChart.data.datasets[0].data = data.timeline.created;
+        timelineChart.data.datasets[1].data = data.timeline.completed;
+        timelineChart.data.datasets[2].data = data.timeline.weight;
+        timelineChart.update();
+
+        const wasteLabels = Object.keys(data.waste_breakdown);
+        const wasteWeights = wasteLabels.map(k => data.waste_breakdown[k].weight);
+        wasteChart.data.labels = wasteLabels;
+        wasteChart.data.datasets[0].data = wasteWeights;
+        wasteChart.update();
+
+        redemptionChart.data.labels = data.top_redemptions.labels.length > 0 ? data.top_redemptions.labels : ['No Redemptions'];
+        redemptionChart.data.datasets[0].data = data.top_redemptions.data.length > 0 ? data.top_redemptions.data : [0];
+        redemptionChart.update();
+
+        collectorChart.data.labels = data.collector_perf.map(c => c.name);
+        collectorChart.data.datasets[0].data = data.collector_perf.map(c => c.assigned);
+        collectorChart.data.datasets[1].data = data.collector_perf.map(c => c.completed);
+        collectorChart.update();
+
+        locationChart.data.labels = data.top_locations.labels;
+        locationChart.data.datasets[0].data = data.top_locations.data;
+        locationChart.update();
+
+        const tbody = document.getElementById('collector-table-body');
+        if (data.collector_perf.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No collector activity recorded for this period.</td></tr>`;
+        } else {
+            tbody.innerHTML = data.collector_perf.map(c => `
+                <tr>
+                    <td><strong>${c.name}</strong></td>
+                    <td>${c.assigned}</td>
+                    <td><span class="badge badge-collected">${c.completed}</span></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>${c.rate}%</span>
+                            <div class="perf-bar-bg" style="width: 80px;">
+                                <div class="perf-bar-fill" style="width: ${c.rate}%;"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><strong>${c.weight} kg</strong></td>
+                    <td><span class="badge badge-assigned">Active</span></td>
+                </tr>
+            `).join('');
+        }
+    }
+
+    function exportReportCSV() {
+        if (!reportData) return;
+
+        let csv = "EcoCycle Ghana - Visual Analytics Report\n";
+        csv += `Timeframe,${reportData.timeframe}\n\n`;
+
+        csv += "Summary KPIs\n";
+        csv += `Total Pickup Requests,${reportData.kpi.total_requests}\n`;
+        csv += `Completed Pickups,${reportData.kpi.completed_requests}\n`;
+        csv += `Assigned Pickups,${reportData.kpi.assigned_requests}\n`;
+        csv += `Pending Pickups,${reportData.kpi.pending_requests}\n`;
+        csv += `Total Waste Collected (kg),${reportData.kpi.total_weight_kg}\n`;
+        csv += `Fulfillment Rate (%),${reportData.kpi.completion_rate}\n`;
+        csv += `Total Vouchers Redeemed,${reportData.kpi.total_redemptions}\n`;
+        csv += `Total Points Redeemed,${reportData.kpi.total_points_spent}\n\n`;
+
+        csv += "Waste Type Breakdown\n";
+        csv += "Category,Request Count,Total Weight (kg)\n";
+        for (const [cat, val] of Object.entries(reportData.waste_breakdown)) {
+            csv += `${cat},${val.count},${val.weight}\n`;
+        }
+        csv += "\n";
+
+        csv += "Collector Performance\n";
+        csv += "Collector Name,Assigned,Completed,Rate (%),Weight Collected (kg)\n";
+        reportData.collector_perf.forEach(c => {
+            csv += `"${c.name}",${c.assigned},${c.completed},${c.rate},${c.weight}\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `ecocycle_ghana_report_${reportData.timeframe}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+{% endblock %}

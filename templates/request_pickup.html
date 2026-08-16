@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="auth-container" style="max-width: 550px;">
+    <div class="card" style="overflow: hidden; padding: 0;">
+        <img src="{{ url_for('static', filename='images/waste_bin_request.jpg') }}" alt="Waste Pickup Banner" style="width: 100%; height: 210px; object-fit: cover;">
+        <div style="padding: 1.75rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; text-align: center;">Request Waste Pickup</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-bottom: 1.75rem;">Fill out the details below and attach a photo of your waste</p>
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="waste_type">Waste Material Type</label>
+                <select id="waste_type" name="waste_type" class="form-control" required>
+                    <option value="Plastic">Plastic (2 pts / kg)</option>
+                    <option value="Metal">Metal (5 pts / kg)</option>
+                    <option value="Paper">Paper (1 pt / kg)</option>
+                    <option value="Glass">Glass (1 pt / kg)</option>
+                    <option value="Rubber">Rubber (3 pts / kg)</option>
+                    <option value="Waste">General Recyclable Waste (3 pts / kg)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="estimated_weight">Estimated Weight (kg)</label>
+                <input id="estimated_weight" type="number" step="0.5" min="0.1" name="estimated_weight" class="form-control" placeholder="e.g. 5.0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="waste_image">Take Live Photo of Waste</label>
+                <input id="waste_image" type="file" name="waste_image" accept="image/*" capture="environment" class="form-control" style="padding: 0.5rem;" required onchange="previewWastePhoto(event)">
+                <small style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 0.3rem;">Tap to open camera and take a live photo of your waste.</small>
+                <div id="photo-preview-box" style="display: none; margin-top: 0.75rem; text-align: center;">
+                    <img id="photo-preview" src="#" alt="Live Waste Preview" style="max-width: 100%; max-height: 180px; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                </div>
+            </div>
+
+            <script>
+            function previewWastePhoto(event) {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const output = document.getElementById('photo-preview');
+                    output.src = reader.result;
+                    document.getElementById('photo-preview-box').style.display = 'block';
+                }
+                if (event.target.files[0]) {
+                    reader.readAsDataURL(event.target.files[0]);
+                }
+            }
+            </script>
+
+            <div class="form-group">
+                <label for="pickup_location">Pickup Location / Address</label>
+                <textarea id="pickup_location" name="pickup_location" class="form-control" rows="3" placeholder="Enter your full street address or location landmark" required></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <a href="/citizen/dashboard" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+                <button type="submit" class="btn btn-primary" style="flex: 2;">Submit Pickup Request</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

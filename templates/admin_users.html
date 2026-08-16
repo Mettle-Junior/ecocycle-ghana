@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-title">
+        <span>User Management</span>
+        <span class="role-pill">{{ users|length }} Users</span>
+    </div>
+    <p style="color: var(--text-secondary);">Manage system users, assign roles, and view recycling leaderboards.</p>
+</div>
+
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value">{{ users|length }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Citizens</div>
+        <div class="stat-value primary">{{ citizens|length }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Collectors</div>
+        <div class="stat-value accent">{{ collectors|length }}</div>
+    </div>
+</div>
+
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-title">
+        <span>Top Recycling Citizens</span>
+    </div>
+
+    {% if leaderboard %}
+    <ul class="leaderboard-list">
+        {% for u in leaderboard %}
+        <li class="leaderboard-item">
+            <div>
+                <span class="leaderboard-rank top-{{ loop.index }}">{{ loop.index }}.</span>
+                <strong>{{ u.first_name }} {{ u.last_name }}</strong>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">(@{{ u.username }})</span>
+            </div>
+            <div>
+                <span class="role-pill">{{ u.role }}</span>
+                <span style="font-weight: 700; color: var(--primary); margin-left: 0.5rem;">{{ u.reward_points }} pts</span>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p style="color: var(--text-muted); font-size: 0.9rem;">No leaderboard entries yet.</p>
+    {% endif %}
+</div>
+
+<div class="table-container">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">All Accounts</h3>
+    </div>
+
+    {% if users %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Username</th>
+                <th>Current Role</th>
+                <th>Phone Number</th>
+                <th>Points Balance</th>
+                <th>Change Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr>
+                <td>#{{ u.id }}</td>
+                <td><strong>{{ u.first_name }} {{ u.last_name }}</strong></td>
+                <td>@{{ u.username }}</td>
+                <td>
+                    {% if u.role == 'admin' %}
+                        <span class="role-pill" style="background-color: #f3e8ff; color: #7e22ce;">Admin</span>
+                    {% elif u.role == 'collector' %}
+                        <span class="role-pill" style="background-color: var(--accent-light); color: var(--accent);">Collector</span>
+                    {% else %}
+                        <span class="role-pill">Citizen</span>
+                    {% endif %}
+                </td>
+                <td>{{ u.phone or 'N/A' }}</td>
+                <td><strong style="color: var(--primary);">{{ u.reward_points }} pts</strong></td>
+                <td>
+                    <form method="POST" action="/admin/users/{{ u.id }}/change-role" style="display: inline-flex; gap: 0.4rem; align-items: center;">
+                        <select name="role" class="form-control" style="padding: 0.35rem 0.6rem; font-size: 0.825rem; width: auto;" {% if u.id == current_user.id %}disabled{% endif %}>
+                            <option value="citizen" {% if u.role == 'citizen' %}selected{% endif %}>Citizen</option>
+                            <option value="collector" {% if u.role == 'collector' %}selected{% endif %}>Collector</option>
+                            <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
+                        </select>
+                        {% if u.id != current_user.id %}
+                        <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                        {% endif %}
+                    </form>
+                </td>
+                <td>
+                    {% if u.id != current_user.id %}
+                        <a href="/admin/users/{{ u.id }}/delete" class="btn btn-danger btn-sm" onclick="return confirm('Delete this user?');">
+                            Delete
+                        </a>
+                    {% else %}
+                        <span style="font-size: 0.825rem; color: var(--text-muted); font-style: italic;">Self</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+        No registered users found.
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

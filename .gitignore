@@ -1,0 +1,34 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Flask & SQLite instances
+instance/
+*.db
+*.sqlite3
+
+# Uploaded waste images during testing
+static/uploads/*
+!static/uploads/sample_waste.jpg
+
+# Environment secret variables
+.env
+.env.local
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Android build outputs
+android/app/build/
+android/.gradle/
+android/local.properties

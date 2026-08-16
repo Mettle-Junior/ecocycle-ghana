@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>Transforming Waste into <span>Value & Rewards</span> in Ghana</h1>
+        <p>EcoCycle Ghana connects citizens, collectors, and recyclers. Schedule waste pickups directly from your home, earn points for recycling, and help build a cleaner, greener community.</p>
+        <div class="hero-actions">
+            {% if current_user.is_authenticated %}
+                {% if current_user.role == "admin" %}
+                    <a href="/admin/dashboard" class="btn btn-primary">Go to Admin Dashboard</a>
+                {% elif current_user.role == "collector" %}
+                    <a href="/collector/dashboard" class="btn btn-primary">Go to Collector Dashboard</a>
+                {% else %}
+                    <a href="/citizen/request-pickup" class="btn btn-primary">Request Waste Pickup</a>
+                {% endif %}
+            {% else %}
+                <a href="/register" class="btn btn-primary">Get Started Today</a>
+                <a href="/login" class="btn btn-secondary">Sign In</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-image-wrapper">
+        <img src="{{ url_for('static', filename='images/real_recycling.jpg') }}" alt="Real Waste Management and Recycling">
+    </div>
+</section>
+
+<section class="features-grid">
+    <div class="feature-card">
+        <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+        </div>
+        <h3 class="feature-title">Earn Rewards</h3>
+        <p class="feature-desc">Collect points for every kilogram of plastic, metal, paper, and glass you submit for recycling.</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/>
+                <circle cx="5.5" cy="18.5" r="2.5"/>
+                <circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+        </div>
+        <h3 class="feature-title">Doorstep Collection</h3>
+        <p class="feature-desc">Schedule convenient waste pickups from authorized local collectors right at your location.</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+        </div>
+        <h3 class="feature-title">Track Status</h3>
+        <p class="feature-desc">Monitor the real-time status of your pickup requests from assignment to completion.</p>
+    </div>
+</section>
+
+{% endblock %}

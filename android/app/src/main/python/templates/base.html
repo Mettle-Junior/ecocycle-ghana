@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>EcoCycle Ghana - Waste Management & Rewards</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-brand">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="EcoCycle Ghana Logo" style="height: 40px; width: auto; object-fit: contain;">
+            <span>EcoCycle Ghana</span>
+        </a>
+
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            {% if current_user.is_authenticated %}
+                {% if current_user.role == "admin" %}
+                    <a href="/admin/dashboard">Dashboard</a>
+                    <a href="/admin/requests">Requests</a>
+                    <a href="/admin/users">Users</a>
+                    <a href="/admin/rewards">Rewards</a>
+                {% elif current_user.role == "collector" %}
+                    <a href="/collector/dashboard">Collector Dashboard</a>
+                {% else %}
+                    <a href="/citizen/dashboard">Dashboard</a>
+                    <a href="/citizen/request-pickup">Request Pickup</a>
+                    <a href="/citizen/redeem">Redeem Rewards</a>
+                {% endif %}
+
+                <div class="user-badge">
+                    <span><strong>{{ current_user.username }}</strong></span>
+                    <span class="role-pill">{{ current_user.role }}</span>
+                </div>
+                <a href="/logout" class="btn btn-secondary btn-sm">Logout</a>
+            {% else %}
+                <a href="/login">Login</a>
+                <a href="/register" class="btn btn-primary btn-sm">Get Started</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main class="main-wrapper">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert-container">
+          {% for msg in messages %}
+            <div class="alert">
+                <span>{{ msg }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+    <div class="nav-container" style="justify-content: center;">
+        <p>&copy; 2026 EcoCycle Ghana. Empowering Sustainable Communities through Reward-Based Recycling.</p>
+    </div>
+</footer>
+
+</body>
+</html>

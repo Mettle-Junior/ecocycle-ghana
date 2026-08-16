@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">EcoCycle Ghana</string>
+    <string name="starting_server">Starting local Flask server...</string>
+    <string name="server_error">Failed to start local Python backend service.</string>
+</resources>

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="auth-container" style="max-width: 500px;">
+    <div class="card">
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; text-align: center;">Create Account</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-bottom: 1.75rem;">Join EcoCycle Ghana to start recycling and earning rewards</p>
+
+        <form method="POST">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input id="first_name" name="first_name" class="form-control" placeholder="Kwame" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input id="last_name" name="last_name" class="form-control" placeholder="Mensah" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username" name="username" class="form-control" placeholder="Choose a username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input id="phone" name="phone" class="form-control" placeholder="024XXXXXXX" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input id="email" name="email" type="email" class="form-control" placeholder="kwame@example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" class="form-control" placeholder="Create a password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Register Account As</label>
+                <select id="role" name="role" class="form-control">
+                    <option value="citizen">Citizen (Recycle & Earn)</option>
+                    <option value="collector">Waste Collector</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+        </form>
+
+        <div style="margin-top: 1.5rem; text-align: center; font-size: 0.875rem; color: var(--text-secondary);">
+            Already have an account? <a href="/login" style="color: var(--primary); font-weight: 700; text-decoration: none;">Sign in here</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

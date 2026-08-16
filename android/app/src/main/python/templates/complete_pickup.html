@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="auth-container" style="max-width: 500px;">
+    <div class="card">
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; text-align: center;">Confirm Collection</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-bottom: 1.5rem;">Enter the verified actual weight to award reward points</p>
+
+        {% if pickup.image_filename %}
+        <div style="margin-bottom: 1.5rem; text-align: center;">
+            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">Uploaded Waste Photo (Verified)</label>
+            <a href="{{ url_for('static', filename='uploads/' + pickup.image_filename) }}" target="_blank">
+                <img src="{{ url_for('static', filename='uploads/' + pickup.image_filename) }}" alt="Waste Photo" style="width: 100%; max-height: 180px; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            </a>
+        </div>
+        {% endif %}
+
+        <div style="background-color: var(--bg-alt); padding: 1rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 1.5rem;">
+            <p style="margin-bottom: 0.35rem; font-size: 0.9rem;"><strong>Request ID:</strong> #{{ pickup.id }}</p>
+            <p style="margin-bottom: 0.35rem; font-size: 0.9rem;"><strong>Waste Type:</strong> {{ pickup.waste_type }}</p>
+            <p style="margin-bottom: 0.35rem; font-size: 0.9rem;"><strong>Est. Weight:</strong> {{ pickup.estimated_weight or '1.0' }} kg</p>
+            <p style="font-size: 0.9rem;"><strong>Location:</strong> {{ pickup.pickup_location }}</p>
+        </div>
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="actual_weight">Actual Verified Weight (kg)</label>
+                <input id="actual_weight" type="number" step="0.1" min="0.1" name="actual_weight" value="{{ pickup.estimated_weight or '1.0' }}" class="form-control" required autofocus>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <a href="/collector/dashboard" class="btn btn-secondary" style="flex: 1;">Cancel</a>
+                <button type="submit" class="btn btn-primary" style="flex: 2;">Confirm & Award Points</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

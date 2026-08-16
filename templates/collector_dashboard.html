@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-title">
+        <span>Collector Dashboard</span>
+        <span class="role-pill">{{ user.role }}</span>
+    </div>
+    <p style="color: var(--text-secondary);">Welcome, {{ user.first_name }} {{ user.last_name }}!</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Assigned Pickups</div>
+        <div class="stat-value accent">{{ pickups|length }}</div>
+    </div>
+</div>
+
+<div class="table-container">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Assigned Pickups</h3>
+    </div>
+
+    {% if pickups %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Waste Photo</th>
+                <th>Waste Type</th>
+                <th>Est. Weight</th>
+                <th>Pickup Location</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in pickups %}
+            <tr>
+                <td>#{{ p.id }}</td>
+                <td>
+                    {% if p.image_filename %}
+                        <a href="{{ url_for('static', filename='uploads/' + p.image_filename) }}" target="_blank">
+                            <img src="{{ url_for('static', filename='uploads/' + p.image_filename) }}" alt="Waste Photo" style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-md);">
+                        </a>
+                    {% else %}
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">No Image</span>
+                    {% endif %}
+                </td>
+                <td>{{ p.waste_type }}</td>
+                <td>{{ p.estimated_weight or '-' }} kg</td>
+                <td>{{ p.pickup_location }}</td>
+                <td><span class="badge badge-assigned">{{ p.status }}</span></td>
+                <td>
+                    <a href="/collector/complete/{{ p.id }}" class="btn btn-primary btn-sm">
+                        Complete Pickup
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+        No assigned pickups right now.
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

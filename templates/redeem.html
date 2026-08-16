@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+    <div>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--text-primary);">Redeem Rewards</h1>
+        <p style="color: var(--text-secondary);">Exchange your earned recycling points for airtime, utility vouchers, and gifts</p>
+    </div>
+    <div style="background-color: var(--primary-light); border: 1px solid var(--border); padding: 0.75rem 1.25rem; border-radius: var(--radius-md); text-align: right;">
+        <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); display: block;">Your Balance</span>
+        <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">{{ user.reward_points }} pts</span>
+    </div>
+</div>
+
+<h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--text-primary);">Available Rewards Catalog</h3>
+
+<div class="features-grid" style="margin-top: 0; margin-bottom: 3rem;">
+    {% for item in catalog %}
+    <div class="feature-card" style="display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+        <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <span class="role-pill" style="font-size: 0.7rem; background-color: var(--accent-light); color: var(--accent);">{{ item.category }}</span>
+                <span class="badge badge-collected" style="font-size: 0.85rem; font-weight: 800;">{{ item.points }} pts</span>
+            </div>
+            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">{{ item.name }}</h4>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem;">{{ item.description or item.desc }}</p>
+        </div>
+
+        <form method="POST">
+            <input type="hidden" name="reward_id" value="{{ item.id }}">
+            {% if user.reward_points >= item.points %}
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Redeem Reward</button>
+            {% else %}
+                <button type="button" class="btn btn-secondary" style="width: 100%; opacity: 0.6; cursor: not-allowed;" disabled>Needs {{ item.points - user.reward_points }} More Pts</button>
+            {% endif %}
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="table-container">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Your Reward Redemption History</h3>
+    </div>
+
+    {% if redemptions %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Reward Item</th>
+                <th>Points Spent</th>
+                <th>Redemption Voucher Code</th>
+                <th>Date Redeemed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in redemptions %}
+            <tr>
+                <td><strong>#{{ r.id }}</strong></td>
+                <td>{{ r.reward_name }}</td>
+                <td><strong>-{{ r.points_spent }} pts</strong></td>
+                <td><code style="background-color: var(--bg-alt); padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border); font-weight: 700; color: var(--primary);">{{ r.redemption_code }}</code></td>
+                <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else 'N/A' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
+        <p style="font-size: 1rem;">You have not redeemed any reward items yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

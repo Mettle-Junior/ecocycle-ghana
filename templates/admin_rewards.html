@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-title">
+        <span>Reward Catalog Management</span>
+        <button onclick="toggleAddForm()" class="btn btn-primary btn-sm">+ Create New Reward</button>
+    </div>
+    <p style="color: var(--text-secondary);">Configure reward point costs, publish vouchers, and manage redemption items.</p>
+</div>
+
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-label">Total Rewards</div>
+        <div class="stat-value">{{ total_rewards }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Active Items</div>
+        <div class="stat-value primary">{{ active_rewards }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Deactivated</div>
+        <div class="stat-value accent">{{ inactive_rewards }}</div>
+    </div>
+</div>
+
+<div id="add-reward-card" class="card" style="display: none; margin-bottom: 2rem;">
+    <div class="card-title">
+        <span>Create New Reward Item</span>
+        <button onclick="toggleAddForm()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+    </div>
+
+    <form action="/admin/rewards/add" method="POST" style="margin-top: 1rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+                <label for="name">Reward Title *</label>
+                <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Shopping Voucher" required>
+            </div>
+
+            <div class="form-group">
+                <label for="points">Points Required *</label>
+                <input type="number" id="points" name="points" class="form-control" placeholder="e.g. 200" min="1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input type="text" id="category" name="category" class="form-control" placeholder="e.g. Groceries" list="category-options">
+                <datalist id="category-options">
+                    {% for cat in categories %}
+                    <option value="{{ cat }}"></option>
+                    {% endfor %}
+                </datalist>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Item Description</label>
+            <textarea id="description" name="description" class="form-control" rows="2" placeholder="Brief explanation of the reward..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+            <button type="button" onclick="toggleAddForm()" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Reward</button>
+        </div>
+    </form>
+</div>
+
+<div class="table-container">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Reward Items</h3>
+        <input type="text" id="rewardSearch" onkeyup="filterRewards()" placeholder="Search title or category..." class="form-control" style="max-width: 250px; padding: 0.4rem 0.8rem; font-size: 0.875rem;">
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Reward Item</th>
+                <th>Category</th>
+                <th>Points Cost</th>
+                <th>Status</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="rewards-tbody">
+            {% for r in rewards %}
+            <tr>
+                <td>#{{ r.id }}</td>
+                <td>
+                    <strong>{{ r.name }}</strong>
+                    {% if r.description %}
+                    <div style="font-size: 0.825rem; color: var(--text-muted); margin-top: 0.2rem;">{{ r.description }}</div>
+                    {% endif %}
+                </td>
+                <td><span class="role-pill">{{ r.category }}</span></td>
+                <td><strong style="color: var(--primary);">{{ r.points }} pts</strong></td>
+                <td>
+                    {% if r.is_active %}
+                    <span class="badge badge-collected">Active</span>
+                    {% else %}
+                    <span class="badge badge-pending">Deactivated</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">
+                    <a href="/admin/rewards/{{ r.id }}/toggle" class="btn btn-secondary btn-sm">
+                        {% if r.is_active %}Deactivate{% else %}Activate{% endif %}
+                    </a>
+                    <button onclick='openEditModal({{ r.id }}, {{ r.name | tojson }}, {{ r.points }}, {{ r.category | tojson }}, {{ (r.description or "") | tojson }}, {{ "true" if r.is_active else "false" }})' class="btn btn-secondary btn-sm">
+                        Edit
+                    </button>
+                    <a href="/admin/rewards/{{ r.id }}/delete" onclick="return confirm('Delete this reward?')" class="btn btn-danger btn-sm">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">No rewards found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="editModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center;">
+    <div class="card" style="width: 100%; max-width: 500px; background: white; margin: 1rem;">
+        <div class="card-title">
+            <span>Edit Reward Item</span>
+            <button onclick="closeEditModal()" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        </div>
+
+        <form id="editForm" method="POST" style="margin-top: 1rem;">
+            <div class="form-group">
+                <label for="edit_name">Reward Title *</label>
+                <input type="text" id="edit_name" name="name" class="form-control" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="edit_points">Points Required *</label>
+                    <input type="number" id="edit_points" name="points" class="form-control" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_category">Category</label>
+                    <input type="text" id="edit_category" name="category" class="form-control" list="category-options">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="edit_description">Item Description</label>
+                <textarea id="edit_description" name="description" class="form-control" rows="2"></textarea>
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" id="edit_is_active" name="is_active" style="width: 18px; height: 18px;">
+                <label for="edit_is_active" style="margin-bottom: 0; cursor: pointer;">Active & Visible in Catalog</label>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                <button type="button" onclick="closeEditModal()" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Reward</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleAddForm() {
+        const card = document.getElementById("add-reward-card");
+        card.style.display = card.style.display === "none" ? "block" : "none";
+    }
+
+    function openEditModal(id, name, points, category, description, isActive) {
+        document.getElementById("editForm").action = `/admin/rewards/${id}/edit`;
+        document.getElementById("edit_name").value = name;
+        document.getElementById("edit_points").value = points;
+        document.getElementById("edit_category").value = category;
+        document.getElementById("edit_description").value = description;
+        document.getElementById("edit_is_active").checked = isActive;
+        document.getElementById("editModal").style.display = "flex";
+    }
+
+    function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+    }
+
+    function filterRewards() {
+        const input = document.getElementById("rewardSearch").value.toLowerCase();
+        const rows = document.querySelectorAll("#rewards-tbody tr");
+        rows.forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none";
+        });
+    }
+</script>
+{% endblock %}
